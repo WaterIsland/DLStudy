@@ -144,12 +144,23 @@ class Mln:
     # caliculate err signals
     # call after call those; input_to_neuron(), teach_to_neuron(), output_for_neuron()
     def error_signals(self):
-        self.error = self.teach - self.neural_element[self.number_of_element-1].value;
-        self.mse = nplnlg.norm(self.error)*0.5
-        
+        # softmax function or not
+        if self.neural_element[self.number_of_element-1].func != nf.softmax:
+            self.error = self.neural_element[self.number_of_element-1].value - self.teach
+            self.error = np.dot(self.teach.T, np.log(self.neural_element[self.number_of_element-1].value))
+        else:
+#            print "T  :", self.teach
+#            print "EV :", self.neural_element[self.number_of_element-1].value
+#            print "EVX:", np.log(self.neural_element[self.number_of_element-1].value)
+###            self.error = np.dot(self.teach.T, np.log(self.neural_element[self.number_of_element-1].value))
+            self.error = self.neural_element[self.number_of_element-1].value - self.teach
+#            print "E  :", self.error
+            self.mse   = np.sum(self.error)
+
     # caliculate output signals
     def output_signals(self):
         tmp_output = self.neural_element[0].value + self.bios
+#        tmp_output = self.neural_element[0].value
         for i in range(1, self.number_of_element):
             if   self.name_of_element[i] == 'weight': tmp_output = np.dot(tmp_output, self.neural_element[i].value);
             elif self.name_of_element[i] == 'node'  : 
@@ -160,6 +171,7 @@ class Mln:
                 else:
                     # add neuron outputs with bios
                     tmp_output = tmp_output + self.bios;
+#                    tmp_output = tmp_output;
                     # apply softmax function to upper value
                     tmp_output = self.neural_element[i].func(tmp_output)#.reshape(tmp_output.shape);
                     self.neural_element[i].value = tmp_output
@@ -170,18 +182,31 @@ class Mln:
     def learn(self, input_data, teach_data):
         # set input and teach signals, and caliculate output and err signals.
         self.input_signals(input_data); self.teach_signals(teach_data); self.output_signals(); self.error_signals()
+
+#        print ""
+#        print "T:", teach_data
+#        print "O:", self.get_output()
+#        print "E:", self.error
+#        exit(0)
+
         # make update value pool
         delta_pool = [[]]
         for i in range(1, self.number_of_element):
             if self.name_of_element[i] == 'weight': delta_pool.append([np.matrix(np.zeros(self.neural_element[i].value.shape))])
             else                                  : delta_pool.append([])
         # back propergation
-        errs = np.array(self.error);
+        # softmax function or not
+        if self.neural_element[self.number_of_element-1].func != nf.softmax:
+            errs = np.array(self.error);
+        else:
+            errs = np.array(self.neural_element[self.number_of_element-1].value - teach_data)
+#            print "errs : ", errs
+
         for i in range(self.number_of_element-1, 1, -2):
             [delta_pool[i-1], delta_part] = nf.back_propergation(errs, np.array(self.neural_element[i].value), self.neural_element[i-2].value.T, self.neural_element[i].func, self.learning_rate); errs = np.array(np.dot(delta_part, self.neural_element[i-1].value.T));
         # update all weights
         for i in range(1, self.number_of_element): 
-            if self.name_of_element[i] == 'weight': self.neural_element[i].value = self.neural_element[i].value + delta_pool[i]
+            if self.name_of_element[i] == 'weight': self.neural_element[i].value = self.neural_element[i].value - delta_pool[i]
 
     # test (using input signals to reach teach signals)
     # input_data : input signals, same dimeision as number of input layer's node.
@@ -208,6 +233,9 @@ class Mln:
     
     def get_max_output_index(self):
         return np.argmax(self.neural_element[len(self.neural_element)-1].value)
+
+    def get_min_output_index(self):
+        return np.argmin(self.neural_element[len(self.neural_element)-1].value)
 
     def get_output(self):
         return self.neural_element[len(self.neural_element)-1].value

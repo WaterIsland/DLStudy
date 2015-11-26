@@ -23,6 +23,7 @@ start = time.time()
 input_data = dp.image_file_read('../../mnist/t10k-images-idx3-ubyte', True)
 labels     = dp.label_file_read('../../mnist/t10k-labels-idx1-ubyte', True)
 # ピクセルの値を0.0-1.0に正規化
+input_data = input_data.astype(np.float64)
 input_data /= input_data.max()
 
 print 'data  size : ', len(input_data)
@@ -50,6 +51,7 @@ for i in range(0, data_num):
     # 予測結果をプール
     predictions.append(neuro_obj.get_max_output_index())
     if neuro_obj.get_max_output_index() != labels[i]:
+#    if neuro_obj.get_min_output_index() != labels[i]:
         print '------Input[%d]------' % i, 'miss : ', labels[i], ' -> ', neuro_obj.get_max_output_index()
         count += 1
     else:
@@ -57,7 +59,7 @@ for i in range(0, data_num):
 #        print '------Input[%d]------' % i, 'same : ', labels[i], ' -> ', neuro_obj.get_max_output_index()
 
 print ''
-print 'correct : ', count, '/', data_num, '(', count * 1.0 / data_num * 100.0, '%)'
+print 'error : ', count, '/', data_num, '(', count * 1.0 / data_num * 100.0, '%)'
 #print confusion_matrix(labels, predictions)
 #print classification_report(labels, predictions)
 
