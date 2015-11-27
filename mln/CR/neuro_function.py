@@ -13,12 +13,20 @@ import numpy as np
 #
 #
 #
-def back_propergation(errs, cur_outputs, pre_outputs, func, learning_rate):
-    if   func == sigmoid    : delta_part = (errs * cur_outputs * (1 - cur_outputs))
-    elif func == tanh       : delta_part = (errs * (1 - np.square(cur_outputs)))
-    elif func == linear     : delta_part = errs
-    elif func == perceptron : delta_part = (errs * 0)
-    elif func == softmax    : delta_part = (errs * cur_outputs * (1 - cur_outputs)) # same sigmoid
+def back_propergation(errs, cur_outputs, pre_outputs, func, learning_rate, solved = 'fitting'):
+    if solved == 'fitting':
+        if   func == sigmoid    : delta_part = (errs * cur_outputs * (1 - cur_outputs))
+        elif func == tanh       : delta_part = (errs * (1 - np.square(cur_outputs)))
+        elif func == linear     : delta_part = errs
+        elif func == perceptron : delta_part = (errs * 0)
+
+    elif solved == 'classification':
+        if   func == sigmoid    : delta_part = errs
+        elif func == tanh       : pass
+        elif func == linear     : pass
+        elif func == perceptron : pass
+        elif func == softmax    : delta_part = errs
+         
     delta = learning_rate * np.dot(pre_outputs, delta_part)
     return [delta, delta_part]
 

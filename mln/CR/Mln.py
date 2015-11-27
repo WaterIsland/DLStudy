@@ -66,12 +66,13 @@ class Mln:
     # output_funcion : output function of all neurons such as 'perceptron', 'sigmoid', 'tanh'
     # learning_rate  : learning rate which use for back propergation (0 < learning_rate <= 1)
     # bios : all layer's bios value
-    def make_neuralnet(self, network_dims, output_funcion = 'sigmoid', learning_rate = 0.15, bios = 1.0):
+    def make_neuralnet(self, network_dims, output_function = ['sigmoid'], learning_rate = 0.15, bios = 1.0, solved = 'fitting'):
+        if len(output_function) + 1 != len(network_dims): print "Invallid number of element: network_dims and output_function is not same."; exit(0)
         self.learning_rate = learning_rate; self.bios = bios
         # make number of element & layer
         self.number_of_layer = len(network_dims); self.number_of_element = len(network_dims)*2-1;
         # make nodes and weights of all layers
-        func = ['linear'] + [output_funcion for i in range(0, len(network_dims)-1)]
+        func = ['linear'] + [func for func in output_function]
         for i in range(0, self.number_of_layer): self.neural_element.append(NeuroNode().make_elment([network_dims[i]], func[i]))
         for i in range(0, self.number_of_layer-1): self.neural_element.insert(i*2+1, NeuroWeight().make_elment(np.array(network_dims[i:i+2])))
         # elements_names presents that a element of parameter of 'neural_elements' is 'node', 'weight', 'error'.
@@ -79,26 +80,8 @@ class Mln:
         self.name_of_element.pop()
         # make teach & error signals
         self.teach = np.matrix([np.zeros(network_dims[len(network_dims)-1])]); self.error = np.matrix([np.zeros(network_dims[len(network_dims)-1])])
-        return self
-
-    # Initialization (Not Constructor)
-    # network_dims  : [input_layer_dimension, hidden_layer_dimension1, hidden_layer_dimension2, ..., output_layer_fimension]
-    # output_funcion : output function of all neurons such as 'perceptron', 'sigmoid', 'tanh'
-    # learning_rate  : learning rate which use for back propergation (0 < learning_rate <= 1)
-    # bios : all layer's bios value
-    def make_neuralnet_with_softmax_function(self, network_dims, output_funcion = 'sigmoid', learning_rate = 0.15, bios = 1.0):
-        self.learning_rate = learning_rate; self.bios = bios
-        # make number of element & layer
-        self.number_of_layer = len(network_dims); self.number_of_element = len(network_dims)*2-1;
-        # make nodes and weights of all layers
-        func = ['linear'] + [output_funcion for i in range(0, len(network_dims)-2)] + ['softmax']
-        for i in range(0, self.number_of_layer): self.neural_element.append(NeuroNode().make_elment([network_dims[i]], func[i]))
-        for i in range(0, self.number_of_layer-1): self.neural_element.insert(i*2+1, NeuroWeight().make_elment(np.array(network_dims[i:i+2])))
-        # elements_names presents that a element of parameter of 'neural_elements' is 'node', 'weight', 'error'.
-        for i in range(0, self.number_of_layer): self.name_of_element.append('node'); self.name_of_element.append('weight')
-        self.name_of_element.pop()
-        # make teach & error signals
-        self.teach = np.matrix([np.zeros(network_dims[len(network_dims)-1])]); self.error = np.matrix([np.zeros(network_dims[len(network_dims)-1])])
+        self.solved = solved
+        self.total_error = 0.
         return self
 
     # show any elements on neural network
@@ -108,14 +91,14 @@ class Mln:
     #       'weight'  : show weights
     #       'node'    : show node signals
     #       'err'     : show error signals
-    #       'mse'     : show MSE(mean squared error)
+    #       'ttlerr'  : show total error signals, if you select "solved = 'fitting'" then you can see MSE, and "solved = 'classification'" then you can see total error.
     def show_element(self, element_name):
-        if   element_name == 'teach'   : print '// Teaches //'          , self.teach; return
-        elif element_name == 'err'     : print '// Output Errors //'    , self.error; return
-        elif element_name == 'mse'     : print '// Output MSE //'       , self.mse  ; return
-        elif element_name == 'input'   : print '// Input //'            , self.neural_element[0].value  ; return
-        elif element_name == 'output'  : print '// Output //'           , self.neural_element[len(self.neural_element)-1].value  ; return
-        elif element_name == 'weight'  : print '// Bios of all Layer //', self.bios
+        if   element_name == 'teach'   : print '// Teaches            //' , self.teach; return
+        elif element_name == 'err'     : print '// Output Errors      //' , self.error; return
+        elif element_name == 'ttlerr'  : print '// Output Total Error //' , self.total_error  ; return
+        elif element_name == 'input'   : print '// Input              //' , self.neural_element[0].value  ; return
+        elif element_name == 'output'  : print '// Output             //' , self.neural_element[len(self.neural_element)-1].value  ; return
+        elif element_name == 'weight'  : print '// Bios of all Layer  //' , self.bios
         names = ['Input'] + ['Hidden' for i in range(0, self.number_of_layer-2)] + ['Output']
         for i in range(0, len(self.name_of_element)):
             if element_name == 'weight'  and self.name_of_element[i] == 'weight': 
@@ -144,23 +127,26 @@ class Mln:
     # caliculate err signals
     # call after call those; input_to_neuron(), teach_to_neuron(), output_for_neuron()
     def error_signals(self):
-        # softmax function or not
-        if self.neural_element[self.number_of_element-1].func != nf.softmax:
-            self.error = self.neural_element[self.number_of_element-1].value - self.teach
-            self.error = np.dot(self.teach.T, np.log(self.neural_element[self.number_of_element-1].value))
-        else:
-#            print "T  :", self.teach
-#            print "EV :", self.neural_element[self.number_of_element-1].value
-#            print "EVX:", np.log(self.neural_element[self.number_of_element-1].value)
-###            self.error = np.dot(self.teach.T, np.log(self.neural_element[self.number_of_element-1].value))
-            self.error = self.neural_element[self.number_of_element-1].value - self.teach
-#            print "E  :", self.error
-            self.mse   = np.sum(self.error)
+        # solved problem
+        if self.solved == 'fitting':
+            self.error       = self.neural_element[self.number_of_element-1].value - self.teach
+            self.total_error = np.sum(self.error)
+        elif self.solved == 'classification':
+            # softmax
+            if self.neural_element[self.number_of_element-1].func == nf.softmax:
+                self.error       = np.array(self.teach) * np.array(np.log(self.neural_element[self.number_of_element-1].value))
+                self.total_error = np.sum(self.error)
+            # sigmoid
+            elif self.neural_element[self.number_of_element-1].func == nf.sigmoid:
+                self.error       = np.array(self.teach.T) *np.array(np.log(self.neural_element[self.number_of_element-1].value)) + np.array(1 - self.teach.T) * np.array(1 - np.log(self.neural_element[self.number_of_element-1].value))
+                self.total_error = np.sum(self.error)
+            # tanh
+            elif self.neural_element[self.number_of_element-1].func == nf.tanh:
+                pass
 
     # caliculate output signals
     def output_signals(self):
         tmp_output = self.neural_element[0].value + self.bios
-#        tmp_output = self.neural_element[0].value
         for i in range(1, self.number_of_element):
             if   self.name_of_element[i] == 'weight': tmp_output = np.dot(tmp_output, self.neural_element[i].value);
             elif self.name_of_element[i] == 'node'  : 
@@ -171,9 +157,8 @@ class Mln:
                 else:
                     # add neuron outputs with bios
                     tmp_output = tmp_output + self.bios;
-#                    tmp_output = tmp_output;
                     # apply softmax function to upper value
-                    tmp_output = self.neural_element[i].func(tmp_output)#.reshape(tmp_output.shape);
+                    tmp_output = self.neural_element[i].func(tmp_output)
                     self.neural_element[i].value = tmp_output
                     
     # learn (using input signals to reach teach signals)
@@ -182,28 +167,33 @@ class Mln:
     def learn(self, input_data, teach_data):
         # set input and teach signals, and caliculate output and err signals.
         self.input_signals(input_data); self.teach_signals(teach_data); self.output_signals(); self.error_signals()
-
-#        print ""
-#        print "T:", teach_data
-#        print "O:", self.get_output()
-#        print "E:", self.error
-#        exit(0)
-
         # make update value pool
         delta_pool = [[]]
         for i in range(1, self.number_of_element):
             if self.name_of_element[i] == 'weight': delta_pool.append([np.matrix(np.zeros(self.neural_element[i].value.shape))])
             else                                  : delta_pool.append([])
-        # back propergation
-        # softmax function or not
-        if self.neural_element[self.number_of_element-1].func != nf.softmax:
-            errs = np.array(self.error);
-        else:
-            errs = np.array(self.neural_element[self.number_of_element-1].value - teach_data)
-#            print "errs : ", errs
 
-        for i in range(self.number_of_element-1, 1, -2):
-            [delta_pool[i-1], delta_part] = nf.back_propergation(errs, np.array(self.neural_element[i].value), self.neural_element[i-2].value.T, self.neural_element[i].func, self.learning_rate); errs = np.array(np.dot(delta_part, self.neural_element[i-1].value.T));
+        # back propergation
+        # solved problem
+        if self.solved == 'fitting':
+            errs = -np.array(self.neural_element[self.number_of_element-1].value - teach_data)
+        elif self.solved == 'classification':
+            # softmax
+            if self.neural_element[self.number_of_element-1].func == nf.softmax:
+                errs = np.array(self.neural_element[self.number_of_element-1].value - teach_data)
+            # sigmoid
+            elif self.neural_element[self.number_of_element-1].func == nf.sigmoid:
+                errs = -np.array(self.neural_element[self.number_of_element-1].value - teach_data)
+            # tanh
+            elif self.neural_element[self.number_of_element-1].func == nf.tanh:
+                pass
+            
+        # caliculate on output layer
+        [delta_pool[self.number_of_element-2], delta_part] = nf.back_propergation(errs, np.array(self.neural_element[self.number_of_element-1].value), self.neural_element[self.number_of_element-3].value.T, self.neural_element[self.number_of_element-1].func, self.learning_rate, solved = self.solved);
+        errs = np.array(np.dot(delta_part, self.neural_element[self.number_of_element-2].value.T));
+
+        for i in range(self.number_of_element-3, 1, -2):
+            [delta_pool[i-1], delta_part] = nf.back_propergation(errs, np.array(self.neural_element[i].value), self.neural_element[i-2].value.T, self.neural_element[i].func, self.learning_rate, solved = 'fitting'); errs = np.array(np.dot(delta_part, self.neural_element[i-1].value.T));
         # update all weights
         for i in range(1, self.number_of_element): 
             if self.name_of_element[i] == 'weight': self.neural_element[i].value = self.neural_element[i].value - delta_pool[i]
@@ -242,3 +232,4 @@ class Mln:
 
     def get_error(self):
         return self.error
+
