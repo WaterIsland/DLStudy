@@ -28,8 +28,9 @@ start = time.time()
 
 # 多層パーセプトロン
 learning_count = 50000
+neuro_obj = mln.Mln().make_neuralnet([2, 3, 4], ['sigmoid', 'softmax'], 0.01, solved = 'classification')
 #neuro_obj = mln.Mln().make_neuralnet([2, 3, 1], ['sigmoid', 'sigmoid'], 0.01, solved = 'classification')
-neuro_obj = mln.Mln().make_neuralnet([2, 3, 1], ['sigmoid', 'sigmoid'], 0.01, solved = 'fit')
+#neuro_obj = mln.Mln().make_neuralnet([2, 3, 1], ['sigmoid', 'sigmoid'], 0.01, solved = 'fit')
 neuro_obj.show_element('weight')
 neuro_obj.show_element('node')
 
@@ -40,7 +41,8 @@ dp.obj_dump(neuro_obj, './default-br.dump')
 
 # XORの入出力データ
 input_data = [[0., 0.], [0.,  1.], [ 1., 0.], [ 1.,  1.]]
-teach_data = [    [0.],      [1.],      [1.],       [0.]]
+#teach_data = [    [0.],      [1.],      [1.],       [0.]]
+teach_data = [[0.,0.,0.,1.],[1.,0.,0.,0.],[0.,1.,0.,0.],[0.,0.,1.,0.]]
 
 data_num = len(input_data)
 

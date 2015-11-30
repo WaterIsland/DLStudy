@@ -196,11 +196,12 @@ class Mln:
                 # softmax function or not
                 if self.neural_element[i].func != nf.softmax:
                     tmp_output = np.matrix([self.neural_element[i].func(element) for element in np.nditer(tmp_output)]).reshape(tmp_output.shape);
-                    pos = tmp_output.shape[1]
-                    self.neural_element[i].value[0, 0:pos] = tmp_output
                 else:
                     # apply softmax function to upper value
                     tmp_output = self.neural_element[i].func(tmp_output)
+                # set neuron output
+                pos = tmp_output.shape[1]
+                self.neural_element[i].value[0, 0:pos] = tmp_output
 
                 print 'node:[AFTER]'
                 print "e[-1]:"
