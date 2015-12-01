@@ -13,21 +13,35 @@ import numpy as np
 #
 #
 #
-def back_propergation(errs, cur_outputs, pre_outputs, func, learning_rate, solved = 'fitting'):
-    if solved == 'fitting':
-        if   func == sigmoid    : delta_part = (errs * cur_outputs * (1 - cur_outputs))
-        elif func == tanh       : delta_part = (errs * (1 - np.square(cur_outputs)))
+def back_propergation(errs, unit_output, preunit_output, func, learning_rate, solved = 'fitting'):
+    print "XXXBP func START**************"
+#    print "unit      :", unit_output
+#    print "preunit   :", preunit_output
+#    print "err       :", errs
+    print "unit      :", unit_output.shape
+    print "preunit   :", preunit_output.shape
+    print "err       :", errs.shape
+    if solved == 'fitting' or solved == 'fit':
+        if   func == sigmoid    : delta_part = (errs * unit_output * (1 - unit_output))
+        elif func == tanh       : delta_part = (errs * (1 - np.square(unit_output)))
         elif func == linear     : delta_part = errs
         elif func == perceptron : delta_part = (errs * 0)
 
-    elif solved == 'classification':
-        if   func == sigmoid    : delta_part = errs;
+    elif solved == 'classification' or solved == 'class':
+        if   func == sigmoid    : delta_part = errs
         elif func == tanh       : pass
-        elif func == linear     : pass
+        elif func == linear     : delta_part = errs
         elif func == perceptron : pass
         elif func == softmax    : delta_part = errs
+
+    print "delta_part:", delta_part.shape
+
+#    delta = learning_rate * np.dot(delta_part, preunit_output)
+    delta = learning_rate * np.dot(preunit_output, delta_part)
+
+    print "delta     :", delta.shape
+    print "ZZZBP func END**************"
          
-    delta = learning_rate * np.dot(pre_outputs, delta_part)
     return [delta, delta_part]
 
 # Sigmoid function

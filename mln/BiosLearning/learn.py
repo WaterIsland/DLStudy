@@ -28,11 +28,11 @@ start = time.time()
 
 # 多層パーセプトロン
 learning_count = 50000
-neuro_obj = mln.Mln().make_neuralnet([2, 3, 4], ['sigmoid', 'softmax'], 0.01, solved = 'classification')
+#neuro_obj = mln.Mln().make_neuralnet([2, 3, 4], ['sigmoid', 'softmax'], 0.01, solved = 'classification')
 #neuro_obj = mln.Mln().make_neuralnet([2, 3, 1], ['sigmoid', 'sigmoid'], 0.01, solved = 'classification')
-#neuro_obj = mln.Mln().make_neuralnet([2, 3, 1], ['sigmoid', 'sigmoid'], 0.01, solved = 'fit')
-neuro_obj.show_element('weight')
-neuro_obj.show_element('node')
+neuro_obj = mln.Mln().make_neuralnet([2, 3, 1], ['sigmoid', 'sigmoid'], 0.01, solved = 'fitting')
+#neuro_obj.show_element('weight')
+#neuro_obj.show_element('node')
 
 
 
@@ -41,22 +41,35 @@ dp.obj_dump(neuro_obj, './default-br.dump')
 
 # XORの入出力データ
 input_data = [[0., 0.], [0.,  1.], [ 1., 0.], [ 1.,  1.]]
-#teach_data = [    [0.],      [1.],      [1.],       [0.]]
-teach_data = [[0.,0.,0.,1.],[1.,0.,0.,0.],[0.,1.,0.,0.],[0.,0.,1.,0.]]
+teach_data = [    [0.],      [1.],      [1.],       [0.]]
+#teach_data = [[0.,0.,0.,1.],[1.,0.,0.,0.],[0.,1.,0.,0.],[0.,0.,1.,0.]]
 
 data_num = len(input_data)
 
+print "----learn----"
+neuro_obj.learn(input_data[1], teach_data[1])
+#neuro_obj.show_element('weight')
+#neuro_obj.show_element('node')
+#neuro_obj.show_element('delta')
 
+exit(0)
+
+
+'''
 neuro_obj.input_signals(input_data[1]); 
-#neuro_obj.show_element('input')
+neuro_obj.show_element('input')
 neuro_obj.teach_signals(teach_data[1]); 
-#neuro_obj.show_element('teach')
+neuro_obj.show_element('teach')
 neuro_obj.output_signals(); 
 neuro_obj.show_element('output')
 neuro_obj.error_signals()
 neuro_obj.show_element('err')
 neuro_obj.show_element('ttlerr')
+
+neuro_obj.show_element('weight')
+neuro_obj.show_element('node')
 exit(0)
+'''
 
 
 print '--start--'

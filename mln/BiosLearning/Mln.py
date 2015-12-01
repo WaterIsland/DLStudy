@@ -24,6 +24,8 @@ class NeuroWeight(NeuroElement):
         if len(dim) == 2:
             self.value = np.matrix([[rand.uniform(-0.5, 0.5) for j in range(0, dim[1])] for k in range(0, dim[0])], dtype = 'float')
             self.value = np.insert(self.value, dim[0], 1.0, axis=0) # add bios weight
+            self.delta_value = np.matrix(np.zeros(dim), dtype = 'float')
+            self.delta_value = np.insert(self.delta_value, dim[0], 0.0, axis=0) # add bios delta
             dim[1] += 1
         else:
             print "Invallid number of element: dim is not 2-dimension."; exit(0)            
@@ -68,7 +70,12 @@ class Mln:
     def __init__(self):
         self.neural_element = []
         self.name_of_element = []
-
+ 
+#    def __init__(self):
+#        # neural_element : This means that input node, weights, hidden node, weights, ..., outputs node are existed sequencially.
+#        self.neural_element = [] ; self.bios = 1.0           ; self.teach = []         ; self.error = []           ; self.mse = 0.0; 
+#        self.learning_rate = 0.15; self.number_of_element = 0; self.number_of_layer = 0; self.name_of_element = []
+ 
     '''
     def __deepcopy__(self, memo):
         mine = Mln()
@@ -107,6 +114,11 @@ class Mln:
         self.error = np.matrix([np.zeros(network_dims[len(network_dims)-1])])
         self.solved = solved
         self.total_error = 0.
+        # make update value pool
+        self.delta_pool = [[]]
+        for i in range(1, self.number_of_element):
+            if self.name_of_element[i] == 'weight': self.delta_pool.append([np.matrix(np.zeros(self.neural_element[i].value.shape))])
+            else                                  : self.delta_pool.append([])
 
         return self
 
@@ -125,14 +137,18 @@ class Mln:
         elif element_name == 'input'   : print '// Input              //' , self.neural_element[0].value  ; return
         elif element_name == 'output'  : print '// Output             //' , self.neural_element[len(self.neural_element)-1].value  ; return
 #        elif element_name == 'weight'  : print '// Bios of all Layer  //' , self.bios
-        names = ['Input'] + ['Hidden' for i in range(0, self.number_of_layer-2)] + ['Output']
-        for i in range(0, len(self.name_of_element)):
-            if element_name == 'weight'  and self.name_of_element[i] == 'weight': 
-                messages = '// Weights of ' + names[0]    ; del names[0]; print messages + ' to ' + names[0] + ' Layer //'; print self.neural_element[i].value  
-            elif element_name == 'node'  and self.name_of_element[i] == 'node'  : 
-                messages = '// Nodes of ' + names[0]      ; del names[0]; print messages + ' //'                          ; print self.neural_element[i].value
-            elif element_name == 'func' and self.name_of_element[i] == 'node'   : 
-                messages = '// Functions of ' + names[0]  ; del names[0]; print messages + ' //'                          ; print self.neural_element[i].func
+        elif element_name == 'weight'  :
+            names = ['Input'] + ['Hidden' for i in range(0, self.number_of_layer-2)] + ['Output']
+            for i in range(0, len(self.name_of_element)):
+                if element_name == 'weight'  and self.name_of_element[i] == 'weight': 
+                    messages = '// Weights of ' + names[0]    ; del names[0]; print messages + ' to ' + names[0] + ' Layer //'; print self.neural_element[i].value  
+                elif element_name == 'node'  and self.name_of_element[i] == 'node'  : 
+                    messages = '// Nodes of ' + names[0]      ; del names[0]; print messages + ' //'                          ; print self.neural_element[i].value
+                elif element_name == 'func' and self.name_of_element[i] == 'node'   : 
+                    messages = '// Functions of ' + names[0]  ; del names[0]; print messages + ' //'                          ; print self.neural_element[i].func
+        elif element_name == 'delta'  :
+            for i in range(0, len(self.name_of_element)-1):
+                print '// Weights delta:'; print self.delta_pool[i]
                 
     # set input signals
     # input_data : input signals, same dimeision as number of input layer's node.
@@ -176,23 +192,8 @@ class Mln:
         for i in range(1, self.number_of_element):
             if   self.name_of_element[i] == 'weight':
                 tmp_output = np.dot(self.neural_element[i-1].value, self.neural_element[i].value);
-                print 'weight:'
-                print "e[-1]:"
-                print self.neural_element[i-1].value
-                print "e[1]:"
-                print self.neural_element[i].value
-                print "tmp:"
-                print tmp_output
 
             elif self.name_of_element[i] == 'node'  : 
-                print 'node:[BEFORE]'
-                print "e[-1]:"
-                print self.neural_element[i-1].value
-                print "e[1]:"
-                print self.neural_element[i].value
-                print "tmp:"
-                print tmp_output
-
                 # softmax function or not
                 if self.neural_element[i].func != nf.softmax:
                     tmp_output = np.matrix([self.neural_element[i].func(element) for element in np.nditer(tmp_output)]).reshape(tmp_output.shape);
@@ -203,32 +204,22 @@ class Mln:
                 pos = tmp_output.shape[1]
                 self.neural_element[i].value[0, 0:pos] = tmp_output
 
-                print 'node:[AFTER]'
-                print "e[-1]:"
-                print self.neural_element[i-1].value
-                print "e[1]:"
-                print self.neural_element[i].value
-                print "tmp:"
-                print tmp_output
-
-                    
     # learn (using input signals to reach teach signals)
     # input_data : input signals, same dimeision as number of input layer's node.
     # teach_data : teach signals, same dimeision as number of output layer's node.
     def learn(self, input_data, teach_data):
         # set input and teach signals, and caliculate output and err signals.
         self.input_signals(input_data); self.teach_signals(teach_data); self.output_signals(); self.error_signals()
-        # make update value pool
         delta_pool = [[]]
         for i in range(1, self.number_of_element):
             if self.name_of_element[i] == 'weight': delta_pool.append([np.matrix(np.zeros(self.neural_element[i].value.shape))])
             else                                  : delta_pool.append([])
-
         # back propergation
         # solved problem
-        if self.solved == 'fitting':
+        errs = 0.
+        if self.solved == 'fitting' or self.solved == 'fit':
             errs = -np.array(self.neural_element[self.number_of_element-1].value - teach_data)
-        elif self.solved == 'classification':
+        elif self.solved == 'classification' or self.solved == 'class':
             # softmax
             if self.neural_element[self.number_of_element-1].func == nf.softmax:
                 errs = np.array(self.neural_element[self.number_of_element-1].value - teach_data)
@@ -238,12 +229,171 @@ class Mln:
             # tanh
             elif self.neural_element[self.number_of_element-1].func == nf.tanh:
                 pass
-            
+
+        # backup delta_pool
+        past_delta_pool = self.delta_pool
         # caliculate on output layer
-        [delta_pool[self.number_of_element-2], delta_part] = nf.back_propergation(errs, np.array(self.neural_element[self.number_of_element-1].value), self.neural_element[self.number_of_element-3].value.T, self.neural_element[self.number_of_element-1].func, self.learning_rate, solved = self.solved);
-        errs = np.array(np.dot(delta_part, self.neural_element[self.number_of_element-2].value.T));
+        pos       = self.neural_element[self.number_of_element-1].value.shape[1]
+        prepos    = self.neural_element[self.number_of_element-2].value.shape
+        preprepos = self.neural_element[self.number_of_element-3].value.shape[1] - 1
+        print "pos            :", pos
+        print "prepos         :", prepos
+        print "preprepos      :", preprepos
+        '''
+        pos    = self.neural_element[self.number_of_element-1].value.shape
+        preprepos = self.neural_element[self.number_of_element-2].value.shape
+        print "pos         :", pos
+        print "preprepos      :", preprepos
+
+        pos    = self.neural_element[self.number_of_element-3].value.shape
+        preprepos = self.neural_element[self.number_of_element-4].value.shape
+        print "pos         :", pos
+        print "preprepos      :", preprepos
+        pos    = self.neural_element[self.number_of_element-5].value.shape
+        print "pos         :", pos
+        return 
+
+        print "pos-shape   :", self.neural_element[self.number_of_element-1].value[0:1, 0:pos].shape
+        print "preprepos-shape:", self.neural_element[self.number_of_element-2].value[0:preprepos].T.shape
+        print "pos         :", pos
+        print "preprepos      :", preprepos
+        '''
+        [tmp_delta_pool_normal, delta_part_normal] =\
+            nf.back_propergation(\
+            errs,\
+                np.array(self.neural_element[self.number_of_element-1].value[0:1, 0:pos]),\
+                self.neural_element[self.number_of_element-3].value[0:1, 0:preprepos].T,\
+                self.neural_element[self.number_of_element-1].func,\
+                self.learning_rate,\
+                solved = self.solved);
+        errs_normal = np.array(np.dot(delta_part_normal, self.neural_element[self.number_of_element-2].value[0:preprepos].T))
+
+        [tmp_delta_pool_bios, delta_part_bios] =\
+            nf.back_propergation(\
+            errs,\
+                np.array(self.neural_element[self.number_of_element-1].value[0:1, pos-1]),\
+                self.neural_element[self.number_of_element-3].value[0:1, preprepos].T,\
+                nf.linear,\
+                self.learning_rate,\
+                solved = 'fitting');
+        errs_bios = np.array(np.dot(delta_part_bios, self.neural_element[self.number_of_element-2].value[preprepos].T))
+        errs      = errs_normal
+
+        tmp = np.matrix(np.zeros((prepos)))
+        tmp[0          :prepos[0]-1] = tmp_delta_pool_normal
+        tmp[prepos[0]-1:prepos[0]  ] = tmp_delta_pool_bios
+        self.delta_pool[self.number_of_element-2] = tmp
+        print "++++++++++++++++++++++++++++++"
+        print "update value:", self.delta_pool
+        print "++++++++++++++++++++++++++++++"
+
+        '''
+        self.show_element('output')
+        print "E1", self.neural_element[self.number_of_element-1].value
+        print "E2", self.neural_element[self.number_of_element-2].value
+        print "E3", self.neural_element[self.number_of_element-3].value
+        print "E4", self.neural_element[self.number_of_element-4].value
+        '''
+        i = self.number_of_element-3
+        pos       = self.neural_element[i].value.shape[1] - 1
+        prepos    = self.neural_element[i-1].value.shape
+        preprepos = self.neural_element[i-2].value.shape[1] - 1
+        '''
+        pos    = self.neural_element[i].value.shape
+        preprepos = self.neural_element[i-1].value.shape
+        print "pos         :", pos
+        print "preprepos      :", preprepos
+        pos    = self.neural_element[i-2].value.shape
+        preprepos = self.neural_element[i-3].value.shape
+        print "pos         :", pos
+        print "preprepos      :", preprepos
+        pos    = self.neural_element[i-4].value.shape
+        print "pos         :", pos
+        return
+        '''
+#        print "pos-shape   :", self.neural_element[i-1].value[0:pos].shape
+#        print "preprepos-shape:", self.neural_element[i-3].value[0:preprepos].T.shape
+        print "pos         :", pos
+        print "preprepos      :", preprepos
+
+        [tmp_delta_pool_normal, delta_part_normal] =\
+            nf.back_propergation(\
+            errs,\
+                np.array(self.neural_element[i].value[0:1, 0:pos]),\
+                self.neural_element[i-2].value[0:1, 0:preprepos].T,\
+                self.neural_element[i].func,\
+                self.learning_rate,\
+                solved = 'fitting');
+        errs_normal = np.array(np.dot(delta_part_normal, self.neural_element[i-1].value[0:preprepos].T))
+        print "up-normal:", tmp_delta_pool_normal
+
+        [tmp_delta_pool_bios, delta_part_bios] =\
+            nf.back_propergation(\
+            errs,\
+                np.array(self.neural_element[i].value[0:1, pos]),\
+                self.neural_element[i-1].value[0:1, preprepos].T,\
+                nf.linear,\
+                self.learning_rate,\
+                solved = 'fitting');
+        errs_bios = np.array(np.dot(delta_part_bios, self.neural_element[i-1].value[preprepos].T))
+        print "up-bios:", tmp_delta_pool_bios
+        errs      = errs_normal
+
+        print "up-normal:", tmp_delta_pool_normal.shape
+        print "up-bios:", tmp_delta_pool_bios.shape
+#        print "up-normal:",np.reshape(tmp_delta_pool_normal, (1,6))
+#        self.delta_pool[i-1] = np.matrix(np.insert(tmp_delta_pool_normal, preprepos, tmp_delta_pool_bios))
+
+        tmp = np.matrix(np.zeros((prepos)))
+        print tmp.shape
+        print tmp_delta_pool_normal.shape
+        print tmp_delta_pool_bios.shape
+        tmp[0          :prepos[0]-1] = tmp_delta_pool_normal
+        tmp[prepos[0]-1:prepos[0]  ] = tmp_delta_pool_bios
+        self.delta_pool[i-1] = tmp
+        print "++++++++++++++++++++++++++++++"
+        print "update value:", self.delta_pool
+        print "++++++++++++++++++++++++++++++"
+
+        '''
+        tmp = np.matrix(np.zeros((3,3)))
+        print tmp.shape
+        tmp[0:2] = tmp_delta_pool_normal
+        tmp[2:3] = tmp_delta_pool_bios
+        print "tmp", tmp
+        self.delta_pool[i-1] = tmp
+        print "++++++++++++++++++++++++++++++"
+        print "update value:", self.delta_pool
+        print "++++++++++++++++++++++++++++++"
+        '''
+#        return
+
+        print "len:", len(self.delta_pool)
+        print self.delta_pool
+
+        self.show_element('weight')
+        for i in range(1, self.number_of_element): 
+            if self.name_of_element[i] == 'weight': 
+                print "tar:", self.neural_element[i].value
+                print "add:", self.delta_pool[i]
+                shapes = self.neural_element[i].value.shape
+                print "shp:", shapes
+                self.neural_element[i].value -= self.delta_pool[i].reshape(shapes)
+        self.show_element('weight')
+
+        return
+    
         for i in range(self.number_of_element-3, 1, -2):
-            [delta_pool[i-1], delta_part] = nf.back_propergation(errs, np.array(self.neural_element[i].value), self.neural_element[i-2].value.T, self.neural_element[i].func, self.learning_rate, solved = 'fitting'); errs = np.array(np.dot(delta_part, self.neural_element[i-1].value.T));
+            [delta_pool[i-1], delta_part] =\
+                nf.back_propergation(\
+                errs,\
+                    np.array(self.neural_element[i].value),\
+                    self.neural_element[i-2].value.T,\
+                    self.neural_element[i].func,\
+                    self.learning_rate,\
+                    solved = 'fitting');
+            errs = np.array(np.dot(delta_part, self.neural_element[i-1].value.T));
+
         # update all weights
         for i in range(1, self.number_of_element): 
             if self.name_of_element[i] == 'weight': self.neural_element[i].value -= delta_pool[i]
