@@ -35,25 +35,25 @@ class NeuroNode():
         self.z = np.array(np.zeros((dim, 1)))
         self.bios = bios
 
-        if   func == 'sigmoid'   : self.f = nf.sigmoid
-        elif func == 'binary'    : self.f = nf.sigmoid
-        elif func == 'tanh'      : self.f = nf.tanh
-        elif func == 'linear'    : self.f = nf.linear
-        elif func == 'perceptron': self.f = nf.perceptron
-        elif func == 'softmax'   : self.f = nf.softmax
+        if   func == 'sigmoid'        : self.f = nf.sigmoid
+        elif func == 'sigmoid_binary' : self.f = nf.sigmoid
+        elif func == 'tanh'           : self.f = nf.tanh
+        elif func == 'linear'         : self.f = nf.linear
+        elif func == 'perceptron'     : self.f = nf.perceptron
+        elif func == 'softmax'        : self.f = nf.softmax
 
         if   derivative_func == 'sigmoid'        : self.df = nf.sigmoid_prime
-        elif derivative_func == 'binary'         : self.df = nf.sigmoid_binary_prime
+        elif derivative_func == 'sigmoid_binary' : self.df = nf.sigmoid_binary_prime
         elif derivative_func == 'tanh'           : self.df = nf.tanh_prime
         elif derivative_func == 'linear'         : self.df = nf.linear_prime
         elif derivative_func == 'perceptron'     : self.df = nf.perceptron_prime
 #        elif derivative_func == 'softmax'        : self.df = nf.softmax_prime
-        elif derivative_func == 'cost_sigmoid'   : self.df = nf.cost_sigmoid_derivative
-        elif derivative_func == 'cost_binary'    : self.df = nf.cost_sigmoid_binary_derivative
-        elif derivative_func == 'cost_tanh'      : self.df = nf.cost_tanh_derivative
-        elif derivative_func == 'cost_linear'    : self.df = nf.cost_linear_derivative
-        elif derivative_func == 'cost_perceptron': self.df = nf.cost_perceptron_derivative
-        elif derivative_func == 'cost_softmax'   : self.df = nf.cost_softmax_derivative
+        elif derivative_func == 'cost_sigmoid'        : self.df = nf.cost_sigmoid_derivative
+        elif derivative_func == 'cost_sigmoid_binary' : self.df = nf.cost_sigmoid_binary_derivative
+        elif derivative_func == 'cost_tanh'           : self.df = nf.cost_tanh_derivative
+        elif derivative_func == 'cost_linear'         : self.df = nf.cost_linear_derivative
+        elif derivative_func == 'cost_perceptron'     : self.df = nf.cost_perceptron_derivative
+        elif derivative_func == 'cost_softmax'        : self.df = nf.cost_softmax_derivative
 
         return self
 

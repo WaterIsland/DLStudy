@@ -126,20 +126,20 @@ class Mln:
     # x : input signals
     # d : teach signals
     def test(self, x, d):
-        pass    
+        self.feedforward(x, d)
+        return [self.get_max_output_index(), self.node[-1].z]
 
     def add_node(self, add_network_dims, output_funcion = 'sigmoid'):
         pass
 
     def get_max_output_index(self):
-        pass
+        return np.argmax(self.node[-1].z)
 
     def get_min_output_index(self):
-        pass
+        return np.argmin(self.node[-1].z)
 
     def get_output(self):
-        pass
-
+        return self.node[-1].z
 
     def get_error(self):
         pass
