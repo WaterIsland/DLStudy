@@ -18,13 +18,9 @@ def test_classification():
     nn_obj = dp.obj_load('./learn-classification.pkl')
 
     print 'read test data.'
-    test_data  = dp.image_file_read('../../mnist/t10k-images-idx3-ubyte', normalize = 'max', show = True)
-    dp.obj_dump_gzip(test_data, '../../mnist/mnist-test_data.pkl.gz')
     test_data  = dp.obj_load_gzip('../../mnist/mnist-test_data.pkl.gz')
 
     print 'read test label.'
-    test_label = dp.label_file_read('../../mnist/t10k-labels-idx1-ubyte', num_class, show = True)
-    dp.obj_dump_gzip(test_label, '../../mnist/mnist-test_label.pkl.gz')
     test_label = dp.obj_load_gzip('../../mnist/mnist-test_label.pkl.gz')
  
     print 'data  size : ', len(test_data)

@@ -1,60 +1,79 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 
-########### Attension
-# [n]     means n-dimension array
-# [m x n] means (m x n)-dimension array
-# no []   means 1-dimension data
-
 import math
 import numpy as np
 
-# Back Propergation
-#
-#
-#
-def back_propergation(errs, cur_outputs, pre_outputs, func, learning_rate, solved = 'fitting'):
-    if solved == 'fitting':
-        if   func == sigmoid    : delta_part = (errs * cur_outputs * (1 - cur_outputs))
-        elif func == tanh       : delta_part = (errs * (1 - np.square(cur_outputs)))
-        elif func == linear     : delta_part = errs
-        elif func == perceptron : delta_part = (errs * 0)
-
-    elif solved == 'classification':
-        if   func == sigmoid    : delta_part = errs;
-        elif func == tanh       : pass
-        elif func == linear     : pass
-        elif func == perceptron : pass
-        elif func == softmax    : delta_part = errs
-         
-    delta = learning_rate * np.dot(pre_outputs, delta_part)
-    return [delta, delta_part]
-
 # Sigmoid function
-# src_data : Value of input signal
-def sigmoid(src_data):
-    return (1 / (1 + math.exp(-src_data)))
+def sigmoid(x):
+    return (1 / (1 + np.exp(-x)))
 
 # Hypubolic tangent function
-# src_data : Value of input signal
-def tanh(src_data):
-    return math.tanh(src_data)
+def tanh(x):
+    return np.tanh(x)
 
 # Linear function
-# src_data : Value of input signal
-def linear(src_data):
-    return src_data
+def linear(x):
+    return x
 
 # Perceptron function
-# src_data : Value of input signal
-def perceptron(src_data):
-    return (0 if src_data <= 0 else 1)
+def perceptron(x):
+    return (0 if x <= 0 else 1)
 
 # SoftMax function
-# src_data : Value of input signal
-# sum_data : Sum Value of all input signal
-def softmax(src_data):
-    tmp = np.exp(src_data)
+def softmax(x):
+    tmp = np.exp(x)
     return tmp / np.sum(tmp)
 
 
+'''
+Derivated cost function's means dE/du = dE/dz * dz/du.
+On this program, dE/dz calls delta.
+'''
+# Derivative Sigmoid function
+def cost_sigmoid_derivative(y, d):
+    return (y - d) * y * (1 - y)
+
+# Derivative Sigmoid function(used to binary classification)
+def cost_sigmoid_binary_derivative(y, d):
+    return (y - d)
+
+# Derivative Hypubolic tangent function
+def cost_tanh_derivative(y, d):
+    return np.dot((y - d), (1 - np.square(y)))
+
+# Derivative Linear function
+def cost_linear_derivative(y, d):
+    return (y - d)
+
+# Derivative Perceptron function
+def cost_perceptron_derivative(y, d):
+    return np.zeros((y.shape[1], y.shape[0]))
+
+# Derivative SoftMax function
+def cost_softmax_derivative(y, d):
+    return (y - d)
+
+
+'''
+Derivated function's means dE/dz = dE/dz.
+'''
+# Prime Sigmoid function
+def sigmoid_prime(y):
+    return y * (1 - y)
+
+# Prime Sigmoid function(used to binary classification)
+def sigmoid_binary_prime(y):
+    return y * (1 - y)
+
+# Prime Hypubolic tangent function
+def tanh_prime(y):
+    return 1. - np.square(y)
+
+# Prime Linear function
+def linear_prime(y):
+    return np.ones((y.shape[1], y.shape[0]))
+
+# Prime Perceptron function
+def perceptron_prime(y):
+    return np.zeros((y.shape[1], y.shape[0]))

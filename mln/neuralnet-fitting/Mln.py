@@ -72,14 +72,11 @@ class Mln:
 
     # caliculate output signals
     def output_signals(self):
-        u = self.node[0].u
-        for weight, node in zip(self.weight, self.node):
-            node.u = u
-            node.z = node.f(u)
-            u = np.dot(weight.w, node.z) + weight.b
+        for weight, node, next_node in zip(self.weight, self.node, self.node[1:]):
+            node.z      = node.f(node.u)
+            next_node.u = np.dot(weight.w, node.z) + weight.b
 
-        self.node[-1].u = u
-        self.node[-1].z = self.node[-1].f(u)
+        self.node[-1].z = self.node[-1].f(self.node[-1].u)
 
     # caliculate err signals
     # call after call those; input_signals(), teach_signals(), output_signals()
@@ -109,18 +106,32 @@ class Mln:
     # learn (using input signals to reach teach signals)
     # x : input signals
     # d : teach signals
-    def learn(self, x, d, epoch, minibatch_size):
-        self.feedforward(x, d)
-
+    def learn(self, x, d):
         delta_w = [np.zeros(item.w.shape) for item in self.weight]
         delta_b = [np.zeros(item.b.shape) for item in self.weight]
-
+        
+        self.feedforward(x, d)
         self.back_propergation(delta_w, delta_b, d)
 
         # update all layer's weights
         for weight, dw, db in zip(self.weight, delta_w, delta_b):
             weight.w -= self.eta * dw
             weight.b -= self.eta * db
+
+            
+    def batch_learn(self, x_vec, d_vec, minibatch_size):
+        delta_w = [np.zeros(item.w.shape) for item in self.weight]
+        delta_b = [np.zeros(item.b.shape) for item in self.weight]
+
+        for x, d in zip(x_vec, d_vec):
+            self.feedforward(x, d)
+            self.back_propergation(delta_w, delta_b, d)
+            
+        # update all layer's weights
+        for weight, dw, db in zip(self.weight, delta_w, delta_b):
+            weight.w -= self.eta * dw / minibatch_size
+            weight.b -= self.eta * db / minibatch_size
+        
 
     # test (using input signals to reach teach signals)
     # x : input signals

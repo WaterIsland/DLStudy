@@ -14,13 +14,6 @@ import numpy as np
 #
 #
 def back_propergation(errs, unit_output, preunit_output, func, learning_rate, solved = 'fitting'):
-    print "XXXBP func START**************"
-#    print "unit      :", unit_output
-#    print "preunit   :", preunit_output
-#    print "err       :", errs
-    print "unit      :", unit_output.shape
-    print "preunit   :", preunit_output.shape
-    print "err       :", errs.shape
     if solved == 'fitting' or solved == 'fit':
         if   func == sigmoid    : delta_part = (errs * unit_output * (1 - unit_output))
         elif func == tanh       : delta_part = (errs * (1 - np.square(unit_output)))
@@ -34,14 +27,19 @@ def back_propergation(errs, unit_output, preunit_output, func, learning_rate, so
         elif func == perceptron : pass
         elif func == softmax    : delta_part = errs
 
-    print "delta_part:", delta_part.shape
-
-#    delta = learning_rate * np.dot(delta_part, preunit_output)
     delta = learning_rate * np.dot(preunit_output, delta_part)
-
-    print "delta     :", delta.shape
-    print "ZZZBP func END**************"
-         
+    '''
+    print "***************************************"
+    print "err    :";print errs
+    print "unit   :";print unit_output
+    print "preunit:";print preunit_output
+    print "func   :";print func
+    print "rate   :";print learning_rate
+    print "solve  :";print solved
+    print "delta-p:";print delta_part
+    print "delta  :";print delta
+    print "***************************************"
+    '''
     return [delta, delta_part]
 
 # Sigmoid function
