@@ -118,6 +118,7 @@ def classification(neuro_obj = None, epoch = 100000, num_class = 10):
 
     print 'data      size : ', len(training_data)
     print 'label     size : ', len(training_data)
+    print "minibatch size : ", minibatch_size
 
     data_num = len(training_data)
 

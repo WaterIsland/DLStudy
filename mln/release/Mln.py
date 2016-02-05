@@ -77,6 +77,7 @@ class Mln:
         self.input_signals(x)
         self.teach_signals(d)
         self.output_signals()
+#        self.error_signals()
 
     def back_propergation(self, delta_w, delta_b, d):
         # caliculate cost function deriviation

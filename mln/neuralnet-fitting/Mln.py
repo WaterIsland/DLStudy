@@ -123,9 +123,19 @@ class Mln:
         delta_w = [np.zeros(item.w.shape) for item in self.weight]
         delta_b = [np.zeros(item.b.shape) for item in self.weight]
 
+#        print ""
         for x, d in zip(x_vec, d_vec):
+#            delta_w2 = [np.zeros(item.w.shape) for item in self.weight]
+#            delta_b2 = [np.zeros(item.b.shape) for item in self.weight]
+#            print "x:"; print x
+#            print "d:"; print d
             self.feedforward(x, d)
             self.back_propergation(delta_w, delta_b, d)
+#            self.back_propergation(delta_w2, delta_b2, d)
+#            print "dw"; print delta_w
+#            print "dw2"; print delta_w2
+#            print "db"; print delta_b
+#            print "db2"; print delta_b2
             
         # update all layer's weights
         for weight, dw, db in zip(self.weight, delta_w, delta_b):
