@@ -57,8 +57,3 @@ class NeuroNode():
 
         return self
 
-    '''
-    def __deepcopy__(self, memo): 
-        mine = NeuroNode(); mine.value = copy.deepcopy(self.value); mine.size  = copy.deepcopy(self.size); mine.func  = copy.deepcopy(self.func); 
-        return mine
-        '''

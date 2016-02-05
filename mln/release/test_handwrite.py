@@ -41,9 +41,10 @@ def recognition_digit_image(fname, digit = 100):
         print "judged:", neuro_obj.get_max_output_index()
     
     # if you wanna show image then you delete comment-out fllowing 3 lines.
-#    cv2.imshow("input_data", im)
-#    cv2.waitKey(0)
-#    cv2.destroyAllWindows()
+    im = cv2.resize(im, (28*10, 28*10))
+    cv2.imshow("input_data", im)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 teach_data = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0] # dummy

@@ -20,16 +20,6 @@ class Mln:
         self.weight = []
         self.node = []
 
-    '''
-    def __deepcopy__(self, memo):
-        mine = Mln()
-        for i in range(0, self.number_of_element): mine.neural_element.append(copy.deepcopy(self.neural_element[i]))
-        mine.bios  = self.bios; mine.teach = np.copy(self.teach); mine.error = np.copy(self.error); mine.mse   = self.mse
-        mine.learning_rate = self.learning_rate; mine.number_of_element = self.number_of_element; mine.number_of_layer   = self.number_of_layer
-        for i in range(0, self.number_of_element): mine.name_of_element.append(self.name_of_element[i])
-        return mine
-    '''
-    
     # Initialization (Not Constructor)
     # network_dims     : [input_layer_dimension, hidden_layer_dimension1, hidden_layer_dimension2, ..., output_layer_fimension]
     # activate_funcion : activate function of hidden layers and output layer neurons such as 'perceptron', 'sigmoid', 'tanh'. See "neuro_function.py".
@@ -87,7 +77,6 @@ class Mln:
         self.input_signals(x)
         self.teach_signals(d)
         self.output_signals()
-#        self.error_signals()
 
     def back_propergation(self, delta_w, delta_b, d):
         # caliculate cost function deriviation
@@ -123,19 +112,9 @@ class Mln:
         delta_w = [np.zeros(item.w.shape) for item in self.weight]
         delta_b = [np.zeros(item.b.shape) for item in self.weight]
 
-#        print ""
         for x, d in zip(x_vec, d_vec):
-#            delta_w2 = [np.zeros(item.w.shape) for item in self.weight]
-#            delta_b2 = [np.zeros(item.b.shape) for item in self.weight]
-#            print "x:"; print x
-#            print "d:"; print d
             self.feedforward(x, d)
             self.back_propergation(delta_w, delta_b, d)
-#            self.back_propergation(delta_w2, delta_b2, d)
-#            print "dw"; print delta_w
-#            print "dw2"; print delta_w2
-#            print "db"; print delta_b
-#            print "db2"; print delta_b2
             
         # update all layer's weights
         for weight, dw, db in zip(self.weight, delta_w, delta_b):
