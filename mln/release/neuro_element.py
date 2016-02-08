@@ -21,11 +21,6 @@ class NeuroWeight():
             print "Invallid number of element: dim is not 2-dimension."; exit(0)            
 
         return self
-    '''
-    def __deepcopy__(self, memo):
-        mine = NeuroWeight(); mine.value = copy.deepcopy(self.value); mine.size  = copy.deepcopy(self.size); 
-        return mine
-        '''
 
 class NeuroNode():
     def __init__(self): pass
@@ -57,11 +52,3 @@ class NeuroNode():
 
         return self
 
-<<<<<<< HEAD
-=======
-    '''
-    def __deepcopy__(self, memo): 
-        mine = NeuroNode(); mine.value = copy.deepcopy(self.value); mine.size  = copy.deepcopy(self.size); mine.func  = copy.deepcopy(self.func); 
-        return mine
-        '''
->>>>>>> 2855ab55d091243b39986b5e89289d55e81d9114
