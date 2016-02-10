@@ -139,6 +139,12 @@ class Mln:
     def get_min_output_index(self):
         return np.argmin(self.node[-1].z)
 
+    def get_target_index(self, digit):
+        return np.where(np.fliplr(np.argsort(np.reshape(self.node[-1].z, (1, 10)))) == digit)[1] + 1
+
+    def get_order_array(self):
+        return np.fliplr(np.argsort(np.reshape(self.node[-1].z, (1, 10))))
+
     def get_output(self):
         return self.node[-1].z
 
