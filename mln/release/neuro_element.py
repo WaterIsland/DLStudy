@@ -13,7 +13,7 @@ class NeuroWeight():
         if len(dim) == 2:
 #            self.w = np.array(nprndm.uniform(-0.1, 0.1, (dim[1], dim[0])))
 #            self.b = np.array(nprndm.uniform(-0.1, 0.1, (dim[1], 1)))
-            # Following init value used by Michael Nielsen, reffered on "http://nnadl-ja.github.io/nnadl_site_ja/index.html".
+            # Following init value used by Michael Nielsen, reffered on "http://nnadl-ja.github.io/nnadl_site_ja/index.html". It means that NN weights conform to Gauss distribution.
             self.w = np.random.randn(dim[1], dim[0])
             self.b = np.random.randn(dim[1], 1)
 

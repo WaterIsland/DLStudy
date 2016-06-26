@@ -19,7 +19,19 @@ class Mln:
         self.name_of_element = []
         self.weight = []
         self.node = []
+        self.use_lambda = False
 
+    # use weight decay parameter which is called 'lambda' originally.
+    # lambda_wd: this value use usally 0.01 - 0.00001.
+    def use_weight_decay(self, lambda_wd = 0.0001):
+        self.use_lambda = True
+        self.lambda_wd  = lambda_wd
+        
+    # unuse weight decay parameter which is called 'lambda' originally.
+    def unuse_weight_decay(self):
+        self.use_lambda = False
+        self.lambda_wd  = 0.
+        
     # Initialization (Not Constructor)
     # network_dims     : [input_layer_dimension, hidden_layer_dimension1, hidden_layer_dimension2, ..., output_layer_fimension]
     # activate_funcion : activate function of hidden layers and output layer neurons such as 'perceptron', 'sigmoid', 'tanh'. See "neuro_function.py".
@@ -41,7 +53,7 @@ class Mln:
         self.num_layer = len(network_dims)
         self.eta       = eta
         self.solved    = solved
- 
+        
         return self
 
     # show any elements on neural network
@@ -119,9 +131,12 @@ class Mln:
             
         # update all layer's weights
         for weight, dw, db in zip(self.weight, delta_w, delta_b):
-            weight.w -= self.eta * dw / minibatch_size
+            # use weight decay?
+            if self.use_lambda == True: 
+                weight.w -= (self.eta * dw + self.lambda_wd * weight.w) / minibatch_size
+            else                      : 
+                weight.w -= self.eta * dw / minibatch_size
             weight.b -= self.eta * db / minibatch_size
-        
 
     # test (using input signals to reach teach signals)
     # x : input signals

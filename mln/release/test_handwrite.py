@@ -14,10 +14,10 @@ import dump as dp
 import progress as prg
 import image as img
 
-from sklearn.datasets import load_digits
-from sklearn.cross_validation import train_test_split
-from sklearn.preprocessing import LabelBinarizer
-from sklearn.metrics import confusion_matrix, classification_report
+#from sklearn.datasets import load_digits
+#from sklearn.cross_validation import train_test_split
+#from sklearn.preprocessing import LabelBinarizer
+#from sklearn.metrics import confusion_matrix, classification_report
 
 
 
@@ -52,8 +52,8 @@ teach_data = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0] # dummy
 print '--start--'
 print '@@ Show after learning @@'
 
-neuro_obj = dp.obj_load('./learn-classification.pkl') # online training's pkl
-#neuro_obj = dp.obj_load('./learn-classification-batch.pkl') # batch training's pkl
+#neuro_obj = dp.obj_load('./learn-classification.pkl') # online training's pkl
+neuro_obj = dp.obj_load('./learn-classification-batch.pkl') # batch training's pkl
 
 recognition_digit_image("../../hand-writing-number/0.png", 0)
 recognition_digit_image("../../hand-writing-number/1.png", 1)
