@@ -131,21 +131,11 @@ class Mln:
             
         # update all layer's weights
         for weight, dw, db in zip(self.weight, delta_w, delta_b):
-
-##            print "use    lambda."
-##            print self.eta * dw / minibatch_size + self.lambda_wd * weight.w
-            
-##            print "unused lambda."
-##            print self.eta * dw / minibatch_size
-
             # use weight decay?
             if self.use_lambda == True: 
-#                weight.w -= self.eta * dw / minibatch_size + self.lambda_wd * weight.w
                 weight.w -= (self.eta * dw + self.lambda_wd * weight.w) / minibatch_size
-##                print "use    lambda."
             else                      : 
                 weight.w -= self.eta * dw / minibatch_size
-##                print "unused lambda."
             weight.b -= self.eta * db / minibatch_size
 
     # test (using input signals to reach teach signals)
