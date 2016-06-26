@@ -14,7 +14,7 @@ start = time.time()
 # XOR fitting
 #
 #nn_obj = fitting(epoch = 50000, minibatch_size = 2) # mini batch
-#nn_obj = fitting(epoch = 20000, minibatch_size = 4) # batch
+nn_obj = fitting(epoch = 20000, minibatch_size = 4) # batch
 
 #
 # XOR Classification
@@ -25,7 +25,7 @@ start = time.time()
 #
 # mnist Classification
 #
-nn_obj = classification(epoch = 10000, minibatch_size = 10) # mini batch
+#nn_obj = classification(epoch = 10000, minibatch_size = 10) # mini batch
 #nn_obj = classification(epoch = 20000, minibatch_size = 10) # mini batch
 #nn_obj = classification(epoch = 20000, minibatch_size = 60000) # batch, using many many time
 
