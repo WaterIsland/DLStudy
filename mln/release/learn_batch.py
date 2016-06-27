@@ -16,10 +16,16 @@ def fitting(neuro_obj = None, epoch = 50000, minibatch_size = 1):
     if neuro_obj: nn_obj = neuro_obj
     else        : nn_obj = mln.Mln().make_neuralnet([2, 3, 1], ['sigmoid', 'sigmoid'], eta = 0.15) # XOR fitting
 
-    print "use weight decay."
+    # use weight decay.
 #    nn_obj.use_weight_decay(0.01)     # unlearnable
 #    nn_obj.use_weight_decay(0.001)    # unlearnable
     nn_obj.use_weight_decay(0.0001)   # learnable
+#    nn_obj.unuse_weight_decay()
+    # use momentum.
+#    nn_obj.use_momentum(0.1)
+    nn_obj.use_momentum(0.5)
+#    nn_obj.use_momentum(0.9)
+#    nn_obj.unuse_momentum()
 
     training_data = \
         [\
@@ -73,10 +79,16 @@ def binary_classification(neuro_obj = None, epoch = 50000, minibatch_size = 1):
     if neuro_obj: nn_obj = neuro_obj
     else        : nn_obj = mln.Mln().make_neuralnet([2, 3, 1], ['sigmoid', 'sigmoid_binary'], eta = 0.15) # XOR classification
 
-    print "use weight decay."
+    # use weight decay.
 #    nn_obj.use_weight_decay(0.01)    # unlearnable
-#    nn_obj.use_weight_decay(0.001)   # unlearnable
+#    nn_obj.use_weight_decay(0.001)   # learnable
     nn_obj.use_weight_decay(0.0001)  # learnable
+#    nn_obj.unuse_weight_decay()
+    # use momentum.
+#    nn_obj.use_momentum(0.1)
+    nn_obj.use_momentum(0.5)
+#    nn_obj.use_momentum(0.9)
+#    nn_obj.unuse_momentum()
 
     training_data = \
         [\
@@ -135,10 +147,16 @@ def classification(neuro_obj = None, epoch = 100000, minibatch_size = 1):
     else        : nn_obj = mln.Mln().make_neuralnet([28*28, 1000, num_class], ['sigmoid', 'softmax'], 0.15) # mnist classification
 #    else        : nn_obj = mln.Mln().make_neuralnet([28*28, 1000, num_class], ['sigmoid', 'softmax'], 0.01) # mnist classification
 
-    print "use weight decay."
+    # use weight decay.
 #    nn_obj.use_weight_decay(0.01)   # unlearnable
 #    nn_obj.use_weight_decay(0.001)  # learnable
     nn_obj.use_weight_decay(0.0001) # learnable
+#    nn_obj.unuse_weight_decay()
+    # use momentum.
+#    nn_obj.use_momentum(0.1)
+    nn_obj.use_momentum(0.5)
+#    nn_obj.use_momentum(0.9)
+#    nn_obj.unuse_momentum()
 
     print "dump obj..."
     dp.obj_dump(nn_obj, './default-classification-batch.pkl')
