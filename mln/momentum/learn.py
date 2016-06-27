@@ -15,7 +15,7 @@ def fitting(neuro_obj = None, epoch = 50000):
     if neuro_obj: nn_obj = neuro_obj
     else        : nn_obj = mln.Mln().make_neuralnet([2, 3, 1], ['sigmoid', 'sigmoid'], eta = 0.15) # XOR fitting
 
-    print "use momentum."
+    # use momentum.
 #    nn_obj.use_momentum(0.1)
     nn_obj.use_momentum(0.5)
 #    nn_obj.use_momentum(0.9)
@@ -66,7 +66,7 @@ def binary_classification(neuro_obj = None, epoch = 50000):
     if neuro_obj: nn_obj = neuro_obj
     else        : nn_obj = mln.Mln().make_neuralnet([2, 3, 1], ['sigmoid', 'sigmoid_binary'], eta = 0.15) # XOR classification
 
-    print "use momentum."
+    # use momentum.
 #    nn_obj.use_momentum(0.1)
     nn_obj.use_momentum(0.5)
 #    nn_obj.use_momentum(0.9)
@@ -122,7 +122,7 @@ def classification(neuro_obj = None, epoch = 100000, num_class = 10):
     else        : nn_obj = mln.Mln().make_neuralnet([28*28, 1000, num_class], ['sigmoid', 'softmax'], 0.01) # mnist classification
 #    else        : nn_obj = mln.Mln().make_neuralnet([28*28, 1000, num_class], ['sigmoid', 'softmax'], 0.15) # mnist classification
 
-    print "use momentum."
+    # use momentum.
 #    nn_obj.use_momentum(0.1)
     nn_obj.use_momentum(0.5)
 #    nn_obj.use_momentum(0.9)

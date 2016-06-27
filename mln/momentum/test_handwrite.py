@@ -52,8 +52,8 @@ teach_data = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0] # dummy
 print '--start--'
 print '@@ Show after learning @@'
 
-neuro_obj = dp.obj_load('./learn-classification.pkl') # online training's pkl
-#neuro_obj = dp.obj_load('./learn-classification-batch.pkl') # batch training's pkl
+#neuro_obj = dp.obj_load('./learn-classification.pkl') # online training's pkl
+neuro_obj = dp.obj_load('./learn-classification-batch.pkl') # batch training's pkl
 
 recognition_digit_image("../../hand-writing-number/0.png", 0)
 recognition_digit_image("../../hand-writing-number/1.png", 1)

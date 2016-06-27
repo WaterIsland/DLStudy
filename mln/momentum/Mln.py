@@ -25,18 +25,21 @@ class Mln:
     # use weight decay parameter which is called 'lambda' originally.
     # lambda_wd: this value use usally 0.01 - 0.00001.
     def use_weight_decay(self, lambda_wd = 0.0001):
+        print "use weight decay [lambda]: ", lambda_wd, "."
         self.use_lambda = True
         self.lambda_wd  = lambda_wd
         if lambda_wd > 0.01: print "[Warning]value of 'weight decay' is too big."
         
     # unuse weight decay parameter which is called 'lambda' originally.
     def unuse_weight_decay(self):
+        print "unuse weight decay [lambda]."
         self.use_lambda = False
         self.lambda_wd  = 0.
 
     # use momentum parameter which is called 'eta' originally.
     # eta_mmntm: this value use usally 0.0 - 1.0.
     def use_momentum(self, mu_mmntm = 0.5):
+        print "use momentum [mu]: ", mu_mmntm, "."
         self.use_mu     = True
         self.mu_mmntm   = mu_mmntm
         self.momentum_w = [np.zeros(item.w.shape) for item in self.weight]
@@ -51,6 +54,7 @@ class Mln:
         
     # unuse momentum parameter which is called 'eta' originally.
     def unuse_momentum(self):
+        print "unuse momentum [mu]."
         self.use_mu   = False
         self.mu_mmntm = 0.
 ##        print self.use_mu, self.mu_mmntm
@@ -138,7 +142,7 @@ class Mln:
         self.feedforward(x, d)
         self.back_propergation(delta_w, delta_b, d)
 
-        # update all layer's weights
+        # update all layer's weights        
         # use momentum?
         if self.use_mu is True:
 ##            print ""
@@ -162,6 +166,21 @@ class Mln:
 ##            print "momentum [tmp w]", tmp_momentum_w
 ##            print "momentum [tmp b]", tmp_momentum_b
 
+##            xxx = []
+##            yyy = []
+##            [xxx, yyy] = self.caliculate_update_values_with_WD(self.weight, delta_w, delta_b, self.momentum_w, self.momentum_b)
+
+##            print "check matrix"
+##            for x, y, uw, ub in zip(xxx, yyy, tmp_momentum_w, tmp_momentum_b):
+##                print "ww:", x - uw
+##                print "wb:", y - ub
+##                print "x:", x
+##                print "uw:", uw
+##                print "y:", y
+##                print "ub:", ub
+
+##            quit()
+                
             self.momentum_w = tmp_momentum_w
             self.momentum_b = tmp_momentum_b
 
@@ -182,14 +201,108 @@ class Mln:
             self.back_propergation(delta_w, delta_b, d)
             
         # update all layer's weights
-        for weight, dw, db in zip(self.weight, delta_w, delta_b):
-            # use weight decay?
-            if self.use_lambda is True: 
-                weight.w -= (self.eta * dw + self.lambda_wd * weight.w) / minibatch_size
-            else                      : 
-                weight.w -= self.eta * dw / minibatch_size
-            weight.b -= self.eta * db / minibatch_size
+        # [use] momentum
+        if self.use_mu is True:
+            tmp_momentum_w = []
+            tmp_momentum_b = []
+            # [use]weight decay
+            if self.use_lambda is True:
+                for weight, dw, db, mw, mb in zip(self.weight, delta_w, delta_b, self.momentum_w, self.momentum_b):
+##                    print ""
+##                    print "[weight]", weight.w
+##                    print "[bias]", weight.b
+##                    print "[dw]", dw
+##                    print "[db]", db
+                    update_w = -(self.eta * dw + self.lambda_wd * weight.w) / minibatch_size + self.mu_mmntm * mw
+                    update_b = -self.eta * db / minibatch_size + self.mu_mmntm * mb
+                    
+##                    xxxupdate_w = -self.eta * dw / minibatch_size + self.mu_mmntm * mw
+##                    xxxupdate_b = -self.eta * db / minibatch_size + self.mu_mmntm * mb
+##                    print "---------"
+##                    print update_w
+##                    print xxxupdate_w
+##                    print update_w - xxxupdate_w
+##                    print update_b
+##                    print xxxupdate_b
+##                    print update_b - xxxupdate_b
+##                    print "---------"
+                    
+                    tmp_momentum_w.append(update_w)
+                    tmp_momentum_b.append(update_b)
+                    weight.w += update_w
+                    weight.b += update_b
+##                    print "[weight]", weight.w
+##                    print "[bias]", weight.b
+##                    print "[up w]", update_w
+##                    print "[up b]", update_b
 
+##                print "momentum [tmp w]", tmp_momentum_w
+##                print "momentum [tmp b]", tmp_momentum_b
+##                quit()
+
+                self.momentum_w = tmp_momentum_w
+                self.momentum_b = tmp_momentum_b
+
+            # [unuse]weight decay
+            else:
+                for weight, dw, db, mw, mb in zip(self.weight, delta_w, delta_b, self.momentum_w, self.momentum_b):
+##                    print ""
+##                    print "[weight]", weight.w
+##                    print "[bias]", weight.b
+##                    print "[dw]", dw
+##                    print "[db]", db
+                    update_w = -self.eta * dw / minibatch_size + self.mu_mmntm * mw
+                    update_b = -self.eta * db / minibatch_size + self.mu_mmntm * mb
+                    tmp_momentum_w.append(update_w)
+                    tmp_momentum_b.append(update_b)
+                    weight.w += update_w
+                    weight.b += update_b
+##                    print "[weight]", weight.w
+##                    print "[bias]", weight.b
+##                    print "[up w]", update_w
+##                    print "[up b]", update_b
+
+##                print "momentum [tmp w]", tmp_momentum_w
+##                print "momentum [tmp b]", tmp_momentum_b
+##                quit()
+
+                self.momentum_w = tmp_momentum_w
+                self.momentum_b = tmp_momentum_b
+
+        # [unuse] momentum
+        else:
+            for weight, dw, db in zip(self.weight, delta_w, delta_b):
+                # [use] weight decay
+                if self.use_lambda is True:
+                    weight.w -= (self.eta * dw + self.lambda_wd * weight.w) / minibatch_size
+                # [unuse] weight decay
+                else:
+                    weight.w -= self.eta * dw / minibatch_size
+                weight.b -= self.eta * db / minibatch_size
+
+    #
+    # use Weight Decay
+    # time cost of function calling is bigger than if-else.
+    def caliculate_update_values_with_WD(self, weight, delta_w, delta_b, minibatch_size):
+        for wght, dw, db in zip(self.weight, delta_w, delta_b):
+            wght.w -= (self.eta * dw + self.lambda_wd * wght.w) / minibatch_size
+
+    #
+    # use MomenTum
+    # time cost of function calling is bigger than if-else.
+    def caliculate_update_values_with_MT(self, weight, delta_w, delta_b, momentum_w, momentum_b):
+        tmp_momentum_w = []
+        tmp_momentum_b = []
+        for wght, dw, db, mw, mb in zip(weight, delta_w, delta_b, momentum_w, momentum_b):
+                update_w = -self.eta * dw + self.mu_mmntm * mw
+                update_b = -self.eta * db + self.mu_mmntm * mb
+                tmp_momentum_w.append(update_w)
+                tmp_momentum_b.append(update_b)
+                wght.w += update_w
+                wght.b += update_b
+                
+        return [tmp_momentum_w, tmp_momentum_b]
+    
     # test (using input signals to reach teach signals)
     # x : input signals
     # d : teach signals
