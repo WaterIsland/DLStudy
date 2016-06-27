@@ -144,7 +144,7 @@ def classification(neuro_obj = None, epoch = 100000, minibatch_size = 1):
 
     print 'initialize Neural Network.'
     if neuro_obj: nn_obj = neuro_obj
-    else        : nn_obj = mln.Mln().make_neuralnet([28*28, 100, num_class], ['sigmoid', 'softmax'], 0.15) # mnist classification
+    else        : nn_obj = mln.Mln().make_neuralnet([28*28, 1000, num_class], ['sigmoid', 'softmax'], 0.15) # mnist classification
 #    else        : nn_obj = mln.Mln().make_neuralnet([28*28, 1000, num_class], ['sigmoid', 'softmax'], 0.01) # mnist classification
 
     # use weight decay.

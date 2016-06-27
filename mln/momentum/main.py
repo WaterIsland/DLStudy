@@ -13,7 +13,7 @@ start = time.time()
 #
 # XOR fitting
 #
-nn_obj = fitting()
+#nn_obj = fitting()
 
 #
 # XOR Classification
@@ -23,7 +23,7 @@ nn_obj = fitting()
 #
 # mnist Classification
 #
-#nn_obj = classification()
+nn_obj = classification()
 
 end = time.time()
 

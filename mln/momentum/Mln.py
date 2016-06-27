@@ -46,18 +46,12 @@ class Mln:
         self.momentum_b = [np.zeros(item.b.shape) for item in self.weight]
         if mu_mmntm > 1.0: print "[Warning]value of 'momentum' is too big."
         if mu_mmntm < 0.0: print "[Warning]value of 'momentum' is too small."
-
-##        print "momentum [w]", self.momentum_w
-##        print "momentum [b]", self.momentum_b
-            
-##        print self.use_mu, self.mu_mmntm
         
     # unuse momentum parameter which is called 'eta' originally.
     def unuse_momentum(self):
         print "unuse momentum [mu]."
         self.use_mu   = False
         self.mu_mmntm = 0.
-##        print self.use_mu, self.mu_mmntm
                 
     # Initialization (Not Constructor)
     # network_dims     : [input_layer_dimension, hidden_layer_dimension1, hidden_layer_dimension2, ..., output_layer_fimension]
@@ -143,55 +137,52 @@ class Mln:
         self.back_propergation(delta_w, delta_b, d)
 
         # update all layer's weights        
-        # use momentum?
+        # [use] momentum
         if self.use_mu is True:
-##            print ""
-##            print "momentum [w]", self.momentum_w
-##            print "momentum [b]", self.momentum_b
             tmp_momentum_w = []
             tmp_momentum_b = []
-            for weight, dw, db, mw, mb in zip(self.weight, delta_w, delta_b, self.momentum_w, self.momentum_b):
-##                print ""
-##                print "[weight]", weight.w
-                update_w = -self.eta * dw + self.mu_mmntm * mw
-                update_b = -self.eta * db + self.mu_mmntm * mb
-                tmp_momentum_w.append(update_w)
-                tmp_momentum_b.append(update_b)
-                weight.w += update_w
-                weight.b += update_b
-##                print "[weight]", weight.w
-##                print "[up w]", update_w
-##                print "[up b]", update_b
+            # [use]weight decay
+            if self.use_lambda is True:
+                for weight, dw, db, mw, mb in zip(self.weight, delta_w, delta_b, self.momentum_w, self.momentum_b):
+                    update_w = -(self.eta * dw + self.lambda_wd * weight.w) + self.mu_mmntm * mw
+                    update_b = -self.eta * db + self.mu_mmntm * mb
+                    tmp_momentum_w.append(update_w)
+                    tmp_momentum_b.append(update_b)
+                    weight.w += update_w
+                    weight.b += update_b
+                self.momentum_w = tmp_momentum_w
+                self.momentum_b = tmp_momentum_b
 
-##            print "momentum [tmp w]", tmp_momentum_w
-##            print "momentum [tmp b]", tmp_momentum_b
+            # [unuse]weight decay
+            else:
+                for weight, dw, db, mw, mb in zip(self.weight, delta_w, delta_b, self.momentum_w, self.momentum_b):
+                    update_w = -self.eta * dw + self.mu_mmntm * mw
+                    update_b = -self.eta * db + self.mu_mmntm * mb
+                    tmp_momentum_w.append(update_w)
+                    tmp_momentum_b.append(update_b)
+                    weight.w += update_w
+                    weight.b += update_b
+                self.momentum_w = tmp_momentum_w
+                self.momentum_b = tmp_momentum_b
 
-##            xxx = []
-##            yyy = []
-##            [xxx, yyy] = self.caliculate_update_values_with_WD(self.weight, delta_w, delta_b, self.momentum_w, self.momentum_b)
-
-##            print "check matrix"
-##            for x, y, uw, ub in zip(xxx, yyy, tmp_momentum_w, tmp_momentum_b):
-##                print "ww:", x - uw
-##                print "wb:", y - ub
-##                print "x:", x
-##                print "uw:", uw
-##                print "y:", y
-##                print "ub:", ub
-
-##            quit()
-                
-            self.momentum_w = tmp_momentum_w
-            self.momentum_b = tmp_momentum_b
-
-##            print "momentum [w]", self.momentum_w
-##            print "momentum [b]", self.momentum_b
-##            quit()
+        # [unuse] momentum
         else:
-            for weight, dw, db in zip(self.weight, delta_w, delta_b):
-                weight.w -= self.eta * dw
-                weight.b -= self.eta * db
-            
+            # [use] weight decay
+            if self.use_lambda is True:
+                for weight, dw, db in zip(self.weight, delta_w, delta_b):
+                    weight.w -= (self.eta * dw + self.lambda_wd * weight.w)
+                    weight.b -= self.eta * db
+
+            # [unuse] weight decay
+            else:
+                for weight, dw, db in zip(self.weight, delta_w, delta_b):
+                    weight.w -= self.eta * dw
+                    weight.b -= self.eta * db
+                
+    # batch learn (using input signals to reach teach signals)
+    # x_vec          : input signals
+    # d_vec          : teach signals
+    # minibatch_size : mini_batch data size
     def batch_learn(self, x_vec, d_vec, minibatch_size):
         delta_w = [np.zeros(item.w.shape) for item in self.weight]
         delta_b = [np.zeros(item.b.shape) for item in self.weight]
@@ -208,101 +199,41 @@ class Mln:
             # [use]weight decay
             if self.use_lambda is True:
                 for weight, dw, db, mw, mb in zip(self.weight, delta_w, delta_b, self.momentum_w, self.momentum_b):
-##                    print ""
-##                    print "[weight]", weight.w
-##                    print "[bias]", weight.b
-##                    print "[dw]", dw
-##                    print "[db]", db
                     update_w = -(self.eta * dw + self.lambda_wd * weight.w) / minibatch_size + self.mu_mmntm * mw
                     update_b = -self.eta * db / minibatch_size + self.mu_mmntm * mb
-                    
-##                    xxxupdate_w = -self.eta * dw / minibatch_size + self.mu_mmntm * mw
-##                    xxxupdate_b = -self.eta * db / minibatch_size + self.mu_mmntm * mb
-##                    print "---------"
-##                    print update_w
-##                    print xxxupdate_w
-##                    print update_w - xxxupdate_w
-##                    print update_b
-##                    print xxxupdate_b
-##                    print update_b - xxxupdate_b
-##                    print "---------"
-                    
                     tmp_momentum_w.append(update_w)
                     tmp_momentum_b.append(update_b)
                     weight.w += update_w
                     weight.b += update_b
-##                    print "[weight]", weight.w
-##                    print "[bias]", weight.b
-##                    print "[up w]", update_w
-##                    print "[up b]", update_b
-
-##                print "momentum [tmp w]", tmp_momentum_w
-##                print "momentum [tmp b]", tmp_momentum_b
-##                quit()
-
                 self.momentum_w = tmp_momentum_w
                 self.momentum_b = tmp_momentum_b
 
             # [unuse]weight decay
             else:
                 for weight, dw, db, mw, mb in zip(self.weight, delta_w, delta_b, self.momentum_w, self.momentum_b):
-##                    print ""
-##                    print "[weight]", weight.w
-##                    print "[bias]", weight.b
-##                    print "[dw]", dw
-##                    print "[db]", db
                     update_w = -self.eta * dw / minibatch_size + self.mu_mmntm * mw
                     update_b = -self.eta * db / minibatch_size + self.mu_mmntm * mb
                     tmp_momentum_w.append(update_w)
                     tmp_momentum_b.append(update_b)
                     weight.w += update_w
                     weight.b += update_b
-##                    print "[weight]", weight.w
-##                    print "[bias]", weight.b
-##                    print "[up w]", update_w
-##                    print "[up b]", update_b
-
-##                print "momentum [tmp w]", tmp_momentum_w
-##                print "momentum [tmp b]", tmp_momentum_b
-##                quit()
-
                 self.momentum_w = tmp_momentum_w
                 self.momentum_b = tmp_momentum_b
 
         # [unuse] momentum
         else:
-            for weight, dw, db in zip(self.weight, delta_w, delta_b):
-                # [use] weight decay
-                if self.use_lambda is True:
+            # [use] weight decay
+            if self.use_lambda is True:
+                for weight, dw, db in zip(self.weight, delta_w, delta_b):
                     weight.w -= (self.eta * dw + self.lambda_wd * weight.w) / minibatch_size
-                # [unuse] weight decay
-                else:
+                    weight.b -= self.eta * db / minibatch_size
+
+            # [unuse] weight decay
+            else:
+                for weight, dw, db in zip(self.weight, delta_w, delta_b):
                     weight.w -= self.eta * dw / minibatch_size
-                weight.b -= self.eta * db / minibatch_size
+                    weight.b -= self.eta * db / minibatch_size
 
-    #
-    # use Weight Decay
-    # time cost of function calling is bigger than if-else.
-    def caliculate_update_values_with_WD(self, weight, delta_w, delta_b, minibatch_size):
-        for wght, dw, db in zip(self.weight, delta_w, delta_b):
-            wght.w -= (self.eta * dw + self.lambda_wd * wght.w) / minibatch_size
-
-    #
-    # use MomenTum
-    # time cost of function calling is bigger than if-else.
-    def caliculate_update_values_with_MT(self, weight, delta_w, delta_b, momentum_w, momentum_b):
-        tmp_momentum_w = []
-        tmp_momentum_b = []
-        for wght, dw, db, mw, mb in zip(weight, delta_w, delta_b, momentum_w, momentum_b):
-                update_w = -self.eta * dw + self.mu_mmntm * mw
-                update_b = -self.eta * db + self.mu_mmntm * mb
-                tmp_momentum_w.append(update_w)
-                tmp_momentum_b.append(update_b)
-                wght.w += update_w
-                wght.b += update_b
-                
-        return [tmp_momentum_w, tmp_momentum_b]
-    
     # test (using input signals to reach teach signals)
     # x : input signals
     # d : teach signals
