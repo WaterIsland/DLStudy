@@ -62,7 +62,7 @@ def loss(logits, output_placeholder):
     return cross_entropy
 
     
-def train(cross_entropy):
+def training(cross_entropy):
     # set learning rete & back-propergation method
     train_step = tf.train.GradientDescentOptimizer(eta).minimize(cross_entropy)    
     return train_step
@@ -121,6 +121,7 @@ if __name__ == '__main__':
                             mnist.validation.labels[num:num+100]
                            )
             print("Train Step:[%d], Accuracy[%f]" % (i, accuracy))
+
     # check NN performance(finish training)
     accuracy = test(x, y_, logits, mnist.test.images, mnist.test.labels)
     print("Accuracy[%f]" % accuracy)
