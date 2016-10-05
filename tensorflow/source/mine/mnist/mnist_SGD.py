@@ -121,6 +121,7 @@ if __name__ == '__main__':
                             mnist.validation.labels[num:num+100]
                            )
             print("Train Step:[%d], Accuracy[%f]" % (i, accuracy))
+
     # check NN performance(finish training)
     accuracy = test(x, y_, logits, mnist.test.images, mnist.test.labels)
     print("Accuracy[%f]" % accuracy)
