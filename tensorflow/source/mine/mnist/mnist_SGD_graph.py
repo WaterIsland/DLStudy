@@ -95,7 +95,6 @@ class ExtendedTensorflow():
                        output_placeholder: outputs})
 
 
-
 ######
 ## test code
 ######
