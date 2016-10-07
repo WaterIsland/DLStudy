@@ -97,9 +97,9 @@ if __name__ == '__main__':
     y_ = tf.placeholder(tf.float32, shape=[None, output_size])
 
     # make Tensorflow base elements
-    logits = inference(x)
+    logits        = inference(x)
     cross_entropy = loss(logits, y_)
-    train_step = train(cross_entropy)
+    train_step    = training(cross_entropy)
 
     # initialize weight and bias
     sess.run(tf.initialize_all_variables())
