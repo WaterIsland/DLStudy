@@ -1,7 +1,10 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 
-
+import sys, os
+import readline
+import numpy as np
+import scipy as sp
 import random
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
