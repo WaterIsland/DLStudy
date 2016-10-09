@@ -144,11 +144,9 @@ if __name__ == '__main__':
             batch = mnist.train.next_batch(20)
             feed_dict={x: batch[0], y_: batch[1]}
             # run train
-            sess.run(train_step, feed_dict=feed_dict)
+            _, cost = sess.run([train_step, cross_entropy], feed_dict=feed_dict)
             if step % 10 == 0:
-                # get accuracy
-                accuracy = sess.run(cross_entropy, feed_dict=feed_dict)
-                print("CrossEntropy[%4d]:%lf" % (step, accuracy))
+                print("CrossEntropy[%4d]:%lf" % (step, cost))
                 # output summary to graph
                 summary_str = sess.run(summary_op, feed_dict=feed_dict)
                 summary_writer.add_summary(summary_str, step)
