@@ -144,11 +144,10 @@ if __name__ == '__main__':
             batch = mnist.train.next_batch(20)
             feed_dict={x: batch[0], y_: batch[1]}
             # run train
-            _, cost = sess.run([train_step, cross_entropy], feed_dict=feed_dict)
+            _, cost, summary_str = sess.run([train_step, cross_entropy, summary_op], feed_dict=feed_dict)
             if step % 10 == 0:
                 print("CrossEntropy[%4d]:%lf" % (step, cost))
                 # output summary to graph
-                summary_str = sess.run(summary_op, feed_dict=feed_dict)
                 summary_writer.add_summary(summary_str, step)
                 
         # close summary writer
