@@ -16,7 +16,7 @@ hidden_size = 200
 output_size = 10
 init_mean   = 0.0
 init_dev    = 0.1
-eta         = 0.01
+eta         = 0.1
 
 
 def inference(input_placeholder):
@@ -61,7 +61,7 @@ def inference(input_placeholder):
 
 def loss(logits, output_placeholder):
     # set cost function
-    cross_entropy = -tf.reduce_sum(output_placeholder * tf.log(logits))
+    cross_entropy = tf.reduce_mean(-tf.reduce_sum(output_placeholder * tf.log(logits), reduction_indices=[1]))
     return cross_entropy
 
     
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     print("Accuracy[%f]" % accuracy)
 
     # training
-    for i in range(2000):
+    for i in range(2001):
         batch = mnist.train.next_batch(20)
         train_step.run(feed_dict={x: batch[0], y_: batch[1]})
         if i % 20 == 0:

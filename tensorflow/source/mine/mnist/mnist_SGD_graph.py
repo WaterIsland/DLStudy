@@ -15,7 +15,7 @@ hidden_size = 200
 output_size = 10
 init_mean   = 0.0
 init_dev    = 0.1
-eta         = 0.01
+eta         = 0.1
 
 
 class ExtendedTensorflow():
@@ -72,7 +72,7 @@ class ExtendedTensorflow():
     def loss(self, logits, output_placeholder):
         with tf.name_scope('loss') as scope:
             # set cost function
-            cross_entropy = -tf.reduce_sum(output_placeholder * tf.log(logits))
+            cross_entropy = tf.reduce_mean(-tf.reduce_sum(output_placeholder * tf.log(logits), reduction_indices=[1]))
 
         return cross_entropy
 
