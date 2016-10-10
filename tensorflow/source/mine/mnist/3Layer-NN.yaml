@@ -1,0 +1,88 @@
+#####
+## Network Parameters
+#####
+network:
+    layer_num: 3
+    scope_name:
+        layer1: 
+            base_name: input
+            output_name: x
+        layer1-2: 
+            weight_name: W1
+            bias_name: b1
+        layer2: 
+            base_name: hidden
+            ## output_name: y1 # no use
+        layer2-3: 
+            weight_name: W2
+            bias_name: b2
+        layer3: 
+            base_name: output
+            ## output_name: y2 # no use
+
+#####
+## Inference Parameters
+#####
+inference:
+    node_number:
+        layer1: 784
+        layer2: 100
+        layer3: 10
+    activation: 
+        layer1: none
+        layer2: relu
+        layer3: softmax
+        ## use following activation
+        ## layerN: relu
+        ## layerN: relu6
+        ## layerN: elu
+        ## layerN: softplus
+        ## layerN: softsign
+        ## layerN: sigmoid
+        ## layerN: tanh
+        ## layerN: softmax        
+    initialize:
+        layer1-2: 
+            weight_param:
+                mean: 0
+                dev: 0.01
+                ## use following parameters in any other; weight_param and bias_param.
+                ## const shouldn't use to weights
+                ## mean: 0.1  # mean
+                ## dev: 0.01  # deviation
+                ## const: 0.1 # const value
+            bias_param:
+                const: 0.1
+#                mean: 0
+#                dev: 0.01
+        layer2-3: 
+            weight_param:
+                mean: 0
+                dev: 0.01
+            bias_param:
+                const: 0.1
+#                mean: 0
+#                dev: 0.01
+
+#####
+## Loss Parameters
+#####                
+loss: 
+    function: crossentoropy
+    ## use following functions
+    ## function: crossentoropy
+    ## function: logistic
+    ## function: mse
+
+#####
+## Training Parameters
+#####
+training:
+    function: GradientDescentOptimizer
+    ## use following functions
+    ## function: GradientDescentOptimizer
+    eta: 0.1
+    optimization: minimize
+    ## use following optimization
+    ## optimization: minimize
+
