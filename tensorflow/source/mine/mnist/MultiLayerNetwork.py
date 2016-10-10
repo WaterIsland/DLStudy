@@ -264,7 +264,7 @@ if __name__ == '__main__':
         sess = tf.InteractiveSession()
 
         obj = MultiLayerNetwork(fname='3Layer-NN.yaml')
-#        obj = NeuralNet(fname='4Layer-NN.yaml')
+#        obj = MultiLayerNetwork(fname='4Layer-NN.yaml')
         obj.inference()
         obj.loss()
         obj.training()
