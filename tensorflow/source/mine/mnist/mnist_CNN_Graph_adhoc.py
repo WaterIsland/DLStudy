@@ -38,11 +38,10 @@ with tf.Graph().as_default():
 
     with tf.name_scope('input') as scope:
         x = tf.placeholder(tf.float32, shape=[None, 784], name='x')
+        x_image = tf.reshape(x, [-1,28,28,1], name='x-pixel_order')
     with tf.name_scope('teach') as scope:
         y_ = tf.placeholder(tf.float32, shape=[None, 10], name='d')
 
-    x_image = tf.reshape(x, [-1,28,28,1])
-    
     # first convolutional layer
     with tf.name_scope('first_convolutional_layer') as scope:
         W_conv1 = weight_variable([5, 5, 1, 32])
