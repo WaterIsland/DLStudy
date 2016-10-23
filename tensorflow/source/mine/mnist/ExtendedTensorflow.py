@@ -51,11 +51,11 @@ class ExtendedTensorflow():
                         dtype=tf.float32)
                 )
 
-                # make outoput evaluation
-            #    y1 = tf.nn.sigmoid(tf.matmul(input_placeholder, W1) + b1)
-            #    y1 = tf.nn.softplus(tf.matmul(input_placeholder, W1) + b1)
+            # make outoput evaluation
             with tf.name_scope('y1') as scope:
                 y1 = tf.nn.relu(tf.matmul(input_placeholder, W1) + b1)
+            #    y1 = tf.nn.sigmoid(tf.matmul(input_placeholder, W1) + b1)
+            #    y1 = tf.nn.softplus(tf.matmul(input_placeholder, W1) + b1)
             with tf.name_scope('output') as scope:
                 y2 = tf.nn.softmax(tf.matmul(y1, W2) + b2)
        
