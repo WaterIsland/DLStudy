@@ -31,11 +31,7 @@ def max_pool_2x2(x):
 
 class ExtendedTensorflowCNN():
     
-    def __init__(self):
-        # probability of drop out.
-        # on training, keep_prob = 0.5 conventionally.
-        # on testing,  keep_prob = 1.0 conventionally.
-        self.keep_prob = tf.placeholder(tf.float32)
+#    def __init__(self):
         
     def inference(self, input_placeholder):
         # first convolutional layer
@@ -61,6 +57,10 @@ class ExtendedTensorflowCNN():
 
         # Dropout
         with tf.name_scope('Dropout') as scope:
+            # probability of drop out.
+            # on training, keep_prob = 0.5 conventionally.
+            # on testing,  keep_prob = 1.0 conventionally.
+            self.keep_prob = tf.placeholder(tf.float32)
             h_fc1_drop = tf.nn.dropout(h_fc1, self.keep_prob)
 
         # Readout Layer

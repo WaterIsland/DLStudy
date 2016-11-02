@@ -142,5 +142,3 @@ with tf.Graph().as_default():
 
     # close session
     sess.close()
-
-        
