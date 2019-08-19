@@ -10,7 +10,7 @@
 
 import numpy as np
 #from functools import partial
-import PIL.Image as Image
+import PIL.Image
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import urllib.request
@@ -193,8 +193,7 @@ def main():
     #channel = 139 # picking some feature channel to visualize
     
     #open image
-    #img0 = PIL.Image.open('pilatus800.jpg')
-    img0 = Image.open(image_name)
+    img0 = PIL.Image.open(image_name)
     img0 = np.float32(img0)
      
     #Step 4 - Apply gradient ascent to that layer
