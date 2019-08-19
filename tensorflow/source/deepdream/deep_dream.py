@@ -193,6 +193,7 @@ def main():
     #channel = 139 # picking some feature channel to visualize
     
     #open image
+    #img0 = PIL.Image.open('pilatus800.jpg')
     img0 = PIL.Image.open(image_name)
     img0 = np.float32(img0)
      
