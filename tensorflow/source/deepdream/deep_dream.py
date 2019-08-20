@@ -194,7 +194,7 @@ def main():
     
     #open image
     #img0 = PIL.Image.open('pilatus800.jpg')
-    img0 = Image.open(image_name)
+    img0 = PIL.Image.open(image_name)
     img0 = np.float32(img0)
      
     #Step 4 - Apply gradient ascent to that layer
